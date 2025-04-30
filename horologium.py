@@ -586,37 +586,43 @@ def print_in_box(text: str) -> None:
 
 
 def horologium():
-    setting = input("""
-    Salve! What setting would you like to use? To pick a location from the Digital Atlas of the Roman Empire, enter 1. To use any latitude and longitude, enter 2.
-    """)
+    while True:
+        setting = input("""
+Salve! What setting would you like to use? To pick a location from the Digital Atlas of the Roman Empire, enter 1. To use any latitude and longitude, enter 2. To quit, enter 0.
+        """)
 
-    if setting == '1':
-        place_id = input("Please enter the place ID of a location from the Digital Atlas of the Roman Empire:")
-        horologium = horologium_romanum(place_id)
-        print_in_box(horologium)
+        if setting == '1':
+            place_id = input("Please enter the place ID of a location from the Digital Atlas of the Roman Empire:")
+            horologium = horologium_romanum(place_id)
+            print("\n\n")
+            print_in_box(horologium)
 
-        while True: 
-            refresh = input("\n\n\n To refresh, press Enter. To quit, enter 0.")
-            if refresh == '0':
-                print('Vale!')
-                break
-            else:
-                horologium = horologium_romanum(place_id)
-                print_in_box(horologium)
+            while True: 
+                refresh = input("\n\n\n To refresh, press Enter. To select a new location, enter 1.")
+                if refresh == '1':
+                    break
+                else:
+                    horologium = horologium_romanum(place_id)
+                    print("\n\n")
+                    print_in_box(horologium)
 
-    elif setting == '2':
-        lat = input("Please enter your latitude, in decimal notation:")
-        lng = input("Please enter your longitude, in decimal notation:")
-        horologium = horologium_universalis(lat, lng)
-        print_in_box(horologium)
+        elif setting == '2':
+            lat = input("Please enter your latitude, in decimal notation:")
+            lng = input("Please enter your longitude, in decimal notation:")
+            horologium = horologium_universalis(lat, lng)
+            print("\n\n")
+            print_in_box(horologium)
 
-        while True: 
-            refresh = input("\n\n\n To refresh, press Enter. To quit, enter 0.")
-            if refresh == '0':
-                print('Vale!')
-                break
-            else:
-                horologium = horologium_universalis(lat, lng)
-                print_in_box(horologium)
+            while True: 
+                refresh = input("\n\n\n To refresh, press Enter. To select a new location, enter 1.")
+                if refresh == '1':
+                    break
+                else:
+                    horologium = horologium_universalis(lat, lng)
+                    print("\n\n")
+                    print_in_box(horologium)
+        elif setting == '0':
+            print('Vale!')
+            break
 
 horologium()
