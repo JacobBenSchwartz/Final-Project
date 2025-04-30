@@ -75,29 +75,29 @@ def calc_dies(risetime, settime):
     hora_undecima = hora_prima+hora*10
     hora_duodecima = hora_prima+hora*11
     if hora_prima <= timenow < hora_secunda:
-        tempus = "I\nprima diei hora"
+        tempus = "\nI\nprima diei hora"
     elif hora_secunda <= timenow < hora_tertia:
-        tempus = "II\nseconda diei hora"
+        tempus = "\nII\nseconda diei hora"
     elif hora_tertia <= timenow < hora_quarta:
-        tempus = "III\ntertia diei hora"
+        tempus = "\nIII\ntertia diei hora"
     elif hora_quarta <= timenow < hora_quinta:
-        tempus = "IV\nquarta diei hora"
+        tempus = "\nIV\nquarta diei hora"
     elif hora_quinta <= timenow < hora_sexta:
-        tempus = "V\nquinta diei hora"
+        tempus = "\nV\nquinta diei hora"
     elif hora_sexta <= timenow < hora_septima:
-        tempus = "VI\nsexta diei hora"
+        tempus = "\nVI\nsexta diei hora"
     elif hora_septima <= timenow < hora_octava:
-        tempus = "VII\nseptima diei hora"
+        tempus = "\nVII\nseptima diei hora"
     elif hora_octava <= timenow < hora_nona:
-        tempus = "VII\noctava diei hora"
+        tempus = "\nVIII\noctava diei hora"
     elif hora_nona <= timenow < hora_decima:
-        tempus = "IX\nnona diei hora"
+        tempus = "\nIX\nnona diei hora"
     elif hora_decima <= timenow < hora_undecima:
-        tempus = "X\ndecima diei hora"
+        tempus = "\nX\ndecima diei hora"
     elif hora_undecima <= timenow < hora_duodecima:
-        tempus = "XI\nundecima diei hora"
+        tempus = "\nXI\nundecima diei hora"
     elif hora_duodecima <= timenow < settime:
-        tempus = "XII\nduodecima diei hora"
+        tempus = "\nXII\nduodecima diei hora"
     else:
         tempus = "Eheu! Couldn't find the hour of the day!"
     return tempus
@@ -119,7 +119,7 @@ def calc_nox_proxima(startime, risetime):
     hora_undecima = hora_prima+hora*10
     hora_duodecima = hora_prima+hora*11
     if hora_prima <= timenow < hora_quarta:
-        watch = "VIGILIA PRIMA\n"
+        watch = "\nVIGILIA PRIMA\n"
         if hora_prima <= timenow < hora_secunda:
             tempus = watch + "I\nprima noctis hora"
         elif hora_secunda <= timenow < hora_tertia:
@@ -127,7 +127,7 @@ def calc_nox_proxima(startime, risetime):
         elif hora_tertia <= timenow < hora_quarta:
             tempus = watch + "III\ntertia noctis hora"
     elif hora_quarta <= timenow < hora_septima:
-        watch = "VIGILIA SECUNDA\n"
+        watch = "\nVIGILIA SECUNDA\n"
         if hora_quarta <= timenow < hora_quinta:
             tempus = watch + "IV\nquarta noctis hora"
         elif hora_quinta <= timenow < hora_sexta:
@@ -135,15 +135,15 @@ def calc_nox_proxima(startime, risetime):
         elif hora_sexta <= timenow < hora_septima:
             tempus = watch + "VI\nsexta noctis hora"
     elif hora_septima <= timenow < hora_decima:
-        watch = "VIGILIA TERTIA\n"
+        watch = "\nVIGILIA TERTIA\n"
         if hora_septima <= timenow < hora_octava:
             tempus = watch + "VII\nseptima noctis hora"
         elif hora_octava <= timenow < hora_nona:
-            tempus = watch + "VII\noctava noctis hora"
+            tempus = watch + "VIII\noctava noctis hora"
         elif hora_nona <= timenow < hora_decima:
             tempus = watch + "IX\nnona noctis hora"
     elif hora_decima <= timenow < risetime:
-        watch = "VIGILIA QUARTA\n"
+        watch = "\nVIGILIA QUARTA\n"
         if hora_decima <= timenow < hora_undecima:
             tempus = watch + "X\ndecima noctis hora"
         elif hora_undecima <= timenow < hora_duodecima:
@@ -170,15 +170,15 @@ def calc_nox_superior(settime, endtime):
     hora_undecima = hora_prima+hora*10
     hora_duodecima = hora_prima+hora*11
     if hora_prima <= timenow < hora_quarta:
-        watch = "VIGILIA PRIMA\n"
+        watch = "\n  VIGILIA PRIMA\n"
         if hora_prima <= timenow < hora_secunda:
-            tempus = watch + "I\nprima noctis hora"
+            tempus = watch + "        I\nprima noctis hora"
         elif hora_secunda <= timenow < hora_tertia:
             tempus = watch + "II\nseconda noctis hora"
         elif hora_tertia <= timenow < hora_quarta:
             tempus = watch + "III\ntertia noctis hora"
     elif hora_quarta <= timenow < hora_septima:
-        watch = "VIGILIA SECUNDA\n"
+        watch = "\nVIGILIA SECUNDA\n"
         if hora_quarta <= timenow < hora_quinta:
             tempus = watch + "IV\nquarta noctis hora"
         elif hora_quinta <= timenow < hora_sexta:
@@ -186,15 +186,15 @@ def calc_nox_superior(settime, endtime):
         elif hora_sexta <= timenow < hora_septima:
             tempus = watch + "VI\nsexta noctis hora"
     elif hora_septima <= timenow < hora_decima:
-        watch = "VIGILIA TERTIA\n"
+        watch = "\nVIGILIA TERTIA\n"
         if hora_septima <= timenow < hora_octava:
             tempus = watch + "VII\nseptima noctis hora"
         elif hora_octava <= timenow < hora_nona:
-            tempus = watch + "VII\noctava noctis hora"
+            tempus = watch + "VIII\noctava noctis hora"
         elif hora_nona <= timenow < hora_decima:
             tempus = watch + "IX\nnona noctis hora"
     elif hora_decima <= timenow < settime:
-        watch = "VIGILIA QUARTA\n"
+        watch = "\nVIGILIA QUARTA\n"
         if hora_decima <= timenow < hora_undecima:
             tempus = watch + "X\ndecima noctis hora"
         elif hora_undecima <= timenow < hora_duodecima:
@@ -466,45 +466,45 @@ def get_mensis_prox(month, year):
 
 def get_datus(day, mensis, mensis_prox):
     if day == mensis['kalendae']:
-        datus = f"Kal. {mensis['abbr.']}\nKalendis {mensis['abl.pl.']}"
+        datus = f"\nKal. {mensis['abbr.']}\n(Kalendis {mensis['abl.pl.']})"
     elif day == mensis['nonae']:
-        datus = f"Non. {mensis['abbr.']}\nNonis {mensis['abl.pl.']}"
+        datus = f"\nNon. {mensis['abbr.']}\n(Nonis {mensis['abl.pl.']})"
     elif day == mensis['idus']:
-        datus = f"Eid. {mensis['abbr.']}\nIdibus {mensis['abl.pl.']}"
+        datus = f"\nEid. {mensis['abbr.']}\n(Idibus {mensis['abl.pl.']})"
     elif day == mensis['nonae']-1:
-        datus = f"prid. Non. {mensis['abbr.']}\npridie Nonas {mensis['acc.fem.pl.']}"
+        datus = f"\nprid. Non. {mensis['abbr.']}\n(pridie Nonas {mensis['acc.fem.pl.']})"
     elif day == mensis['idus']-1:
-        datus = f"prid. Non. {mensis['abbr.']}\npridie Idus {mensis['acc.fem.pl.']}"
+        datus = f"\nprid. Non. {mensis['abbr.']}\n(pridie Idus {mensis['acc.fem.pl.']})"
     elif day == mensis['days']:
-        datus = f"prid. Kal. {mensis_prox['abbr.']}\npridie Kalendas {mensis_prox['acc.fem.pl.']}"
+        datus = f"\nprid. Kal. {mensis_prox['abbr.']}\n(pridie Kalendas {mensis_prox['acc.fem.pl.']})"
     elif mensis == menses['Februarius (leap year)']:
         if day == 25:
-            datus = "a.d. VI Kal. Mar.\nante diem bis sextum Kalendas Martias"
+            datus = "\na.d. VI Kal. Mar.\n(ante diem bis sextum Kalendas Martias)"
         elif mensis['idus'] < day < 25:
             number = mensis['days']-day+1
             numeral = num2roman(number)
             ordinal = ordinals[number]
-            datus = f"a.d. {numeral} Kal. Mar.\nante diem {ordinal} Kalendas Martias"
+            datus = f"\na.d. {numeral} Kal. Mar.\n(ante diem {ordinal} Kalendas Martias)"
         elif day > 25:
             number = mensis['days']-day+2
             numeral = num2roman(number)
             ordinal = ordinals[number]
-            datus = f"a.d. {numeral} Kal. Mar.\nante diem {ordinal} Kalendas Martias"
+            datus = f"\na.d. {numeral} Kal. Mar.\n(ante diem {ordinal} Kalendas Martias)"
     elif mensis['kalendae'] < day < mensis['nonae']-1:
         number = mensis['nonae']-day+1
         numeral = num2roman(number)
         ordinal = ordinals[number]
-        datus = f"a.d. {numeral} Non. {mensis['abbr.']}\nante diem {ordinal} Nonas {mensis['acc.fem.pl.']}"
+        datus = f"\na.d. {numeral} Non. {mensis['abbr.']}\n(ante diem {ordinal} Nonas {mensis['acc.fem.pl.']})"
     elif mensis['nonae'] < day < mensis['idus']:
         number = mensis['idus']-day+1
         numeral = num2roman(number)
         ordinal = ordinals[number]
-        datus = f"a.d. {numeral} Eid. {mensis['abbr.']}\nante diem {ordinal} Idus {mensis['acc.fem.pl.']}"
+        datus = f"\na.d. {numeral} Eid. {mensis['abbr.']}\n(ante diem {ordinal} Idus {mensis['acc.fem.pl.']})"
     elif day > mensis['idus']:
         number = mensis['days']-day+2
         numeral = num2roman(number)
         ordinal = ordinals[number]
-        datus = f"a.d. {numeral} Kal. {mensis_prox['abbr.']}\nante diem {ordinal} Kalendas {mensis_prox['acc.fem.pl.']}"
+        datus = f"\na.d. {numeral} Kal. {mensis_prox['abbr.']}\n(ante diem {ordinal} Kalendas {mensis_prox['acc.fem.pl.']})"
 
     return datus
 
@@ -550,23 +550,55 @@ def horologium_romanum(place_id):
     datus_et_tempus = f"{datus}\n{tempus}"
     return datus_et_tempus
 
+# Solution found here: https://www.reddit.com/r/learnpython/comments/1c19y94/learning_dynamic_text_box/
+def print_in_box(text: str) -> None:
+    """Print multi-line text in a box."""
+    margin_width = 2
+    horizontal_border_char = '='
+    vertical_border_char = '|'
+
+    lines = text.split('\n')
+    max_line_length = max(len(line) for line in lines)
+
+    max_line_length += 2 * margin_width
+    horizontal_border = (
+        vertical_border_char +
+        horizontal_border_char * max_line_length +
+        vertical_border_char
+        )
+
+    print(horizontal_border)
+
+    for line in lines:
+        # Calculate margin widths.
+        left_margin = (max_line_length - len(line)) // 2
+        right_margin = max_line_length - (len(line) + left_margin)
+
+        formatted_line = (
+            f"{vertical_border_char}"
+            f"{' ' * left_margin}{line}{' ' * right_margin}"
+            f"{vertical_border_char}"
+            )
+
+        print(formatted_line)
+
+    print(horizontal_border)
 
 
 def horologium():
     setting = input("""
-    What setting would you like to use? To pick a location from the Digital Atlas of the Roman Empire, enter 1. To use any latitude and longitude, enter 2.
+    Salve! What setting would you like to use? To pick a location from the Digital Atlas of the Roman Empire, enter 1. To use any latitude and longitude, enter 2.
     """)
 
     if setting == '1':
         place_id = input("Please enter the place ID of a location from the Digital Atlas of the Roman Empire:")
         horologium = horologium_romanum(place_id)
-        print(horologium)
+        print_in_box(horologium)
 
     elif setting == '2':
         lat = input("Please enter your latitude, in decimal notation:")
         lng = input("Please enter your longitude, in decimal notation:")
         horologium = horologium_universalis(lat, lng)
-        print(horologium)
-
+        print_in_box(horologium)
 
 horologium()
