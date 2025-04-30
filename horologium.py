@@ -525,7 +525,7 @@ def horologium_universalis(lat, lng):
     mensis = get_mensis_from_month(month, year)
     mensis_prox = get_mensis_prox(month, year)
     datus = get_datus(day, mensis, mensis_prox)
-    datus_et_tempus = f"{datus}\n{tempus}"
+    datus_et_tempus = f"{datus}\n{tempus}\n"
     return datus_et_tempus
 
 
@@ -547,7 +547,7 @@ def horologium_romanum(place_id):
     mensis = get_mensis_from_month(month, year)
     mensis_prox = get_mensis_prox(month, year)
     datus = get_datus(day, mensis, mensis_prox)
-    datus_et_tempus = f"{datus}\n{tempus}"
+    datus_et_tempus = f"{datus}\n{tempus}\n"
     return datus_et_tempus
 
 # Solution found here: https://www.reddit.com/r/learnpython/comments/1c19y94/learning_dynamic_text_box/
