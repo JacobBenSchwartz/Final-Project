@@ -1,5 +1,4 @@
 import datetime
-from datetime import timezone
 import pytz
 from timezonefinder import TimezoneFinder
 import requests
