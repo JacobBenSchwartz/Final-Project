@@ -1,5 +1,7 @@
 import datetime
 from datetime import timezone
+import pytz
+from timezonefinder import TimezoneFinder
 import requests
 
 timenowtz = datetime.datetime.now(timezone.utc)
@@ -24,6 +26,13 @@ def make_coord_request(place_id):
     lat = response['features'][0]['geometry']['coordinates'][1]
     lng = response['features'][0]['geometry']['coordinates'][0]
     return [lat, lng]
+
+# Solution found here: https://stackoverflow.com/questions/15742045/getting-time-zone-from-lat-long-coordinates
+def find_local_date(lat, lng):
+    tf = TimezoneFinder()  # reuse
+
+    tz = tf.timezone_at(lng=lng, lat=lat)
+    return tz
 
 # Powered by SunriseSunset.io: https://sunrisesunset.io/api/
 def make_sun_request(lat, lng):
