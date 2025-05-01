@@ -588,7 +588,7 @@ def print_in_box(text: str) -> None:
 def horologium():
     while True:
         setting = input("""
-Salve! What setting would you like to use? To pick a location from the Digital Atlas of the Roman Empire, enter 1. To use any latitude and longitude, enter 2. To quit, enter 0.
+Salve! What setting would you like to use? To pick a location from the Digital Atlas of the Roman Empire (https://imperium.ahlfeldt.se/), enter 1. To use any latitude and longitude, enter 2. To quit, enter 0.
         """)
 
         if setting == '1':
