@@ -16,54 +16,6 @@ def make_coord_request(place_id):
     lng = response['features'][0]['geometry']['coordinates'][0]
     return [lat, lng]
 
-# Modified solution from here: https://stackoverflow.com/questions/15742045/getting-time-zone-from-lat-long-coordinates
-# and from here: https://www.geeksforgeeks.org/get-current-time-in-different-timezone-using-python/
-def find_local_timezone(lat, lng):
-    tf = TimezoneFinder()  # reuse
-    
-    latfl = float(lat)
-    lngfl =float(lng)
-
-    tz = tf.timezone_at(lng=lngfl, lat=latfl)
-    loc = pytz.timezone(tz)
-    return loc
-
-# Powered by SunriseSunset.io: https://sunrisesunset.io/api/
-def make_sun_request(lat, lng, thedate, datebefore, dateafter):
-    url = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={thedate}&time_format=24"
-    r = requests.get(url)
-    response = r.json()
-    sunrise = response['results']['sunrise']
-    sunset = response['results']['sunset']
-
-    url2 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={datebefore}&time_format=24"
-    r2 = requests.get(url2)
-    response2 = r2.json()
-    nightstart = response2['results']['sunset']
-
-    url3 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={dateafter}&time_format=24"
-    r3 = requests.get(url3)
-    response3 = r3.json()
-    nightend = response3['results']['sunrise']
-
-    return [nightstart, sunrise, sunset, nightend]
-
-def convert_sun_to_datetime(nightstart, sunrise, sunset, nightend, thedate, datebefore, dateafter):
-    starttime = datetime.datetime.strptime(f"{datebefore}, {nightstart}", "%Y-%m-%d, %H:%M:%S")
-    risetime = datetime.datetime.strptime(f"{thedate}, {sunrise}", "%Y-%m-%d, %H:%M:%S")
-    settime = datetime.datetime.strptime(f"{thedate}, {sunset}", "%Y-%m-%d, %H:%M:%S")
-    endtime = datetime.datetime.strptime(f"{dateafter}, {nightend}", "%Y-%m-%d, %H:%M:%S")
-    return [starttime, risetime, settime, endtime]
-
-def get_datetimes_from_coord(lat, lng, thedate, datebefore, dateafter):
-    srss = make_sun_request(lat, lng, thedate, datebefore, dateafter)
-    nightstart = srss[0]
-    sunrise = srss[1]
-    sunset = srss[2]
-    nightend = srss[3]
-    datetimes = convert_sun_to_datetime(nightstart, sunrise, sunset, nightend, thedate, datebefore, dateafter)
-    return datetimes
-
 def calc_dies(risetime, settime, timenow):
     dies = settime-risetime
     hora = dies/12
@@ -209,49 +161,6 @@ def calc_nox_superior(settime, endtime, timenow):
     else:
         tempus = "Eheu! Couldn't find the hour of the next night!"
     return tempus 
-
-def get_tempus_from_coord(lat, lng, timenow, thedate, datebefore, dateafter):
-    datetimes = get_datetimes_from_coord(lat, lng, timenow, thedate, datebefore, dateafter,)
-    starttime = datetimes[0]
-    risetime = datetimes[1]
-    settime = datetimes[2]
-    endtime = datetimes[3]
-    if starttime <= timenow < risetime:
-        nox_proxima = calc_nox_proxima(starttime, risetime, timenow)
-        return nox_proxima
-    elif risetime <= timenow < settime:
-        dies = calc_dies(risetime, settime)
-        return dies
-    elif settime <= timenow < endtime:
-        nox_superior = calc_nox_superior(settime, endtime, timenow)
-        return nox_superior
-    else:
-        return "Eheu! Couldn't get the time from the sun"
-
-
-
-def modify_date(starttime, risetime, settime, endtime, timenow, thedate, datebefore, dateafter):
-    if starttime <= timenow < risetime:
-        nox_proxima = risetime - starttime
-        dimidium = nox_proxima/2
-        media_nox = starttime + dimidium
-        if starttime <= timenow < media_nox:
-            mod_date = datebefore
-        else:
-            mod_date = thedate
-    elif settime <= timenow < endtime:
-        nox_superior = endtime - settime
-        dimidium = nox_superior/2
-        media_nox = settime + dimidium
-        if media_nox <= timenow < endtime:
-            mod_date = dateafter
-        else:
-            mod_date = thedate
-    elif risetime <= timenow < settime:
-        mod_date = thedate
-    else:
-        mod_date = "Eheu! Couldn't figure out if it's past midnight!"
-    return mod_date
 
 
 def split_date(mod_date):
@@ -516,7 +425,16 @@ def get_datus(day, mensis, mensis_prox):
 
 
 def horologium_universalis(lat, lng):
-    loc = find_local_timezone(lat, lng)
+    # Find local timezone
+    # Modified solution from here: https://stackoverflow.com/questions/15742045/getting-time-zone-from-lat-long-coordinates
+    # and from here: https://www.geeksforgeeks.org/get-current-time-in-different-timezone-using-python/
+    tf = TimezoneFinder()
+    
+    latfl = float(lat)
+    lngfl =float(lng)
+
+    tz = tf.timezone_at(lng=lngfl, lat=latfl)
+    loc = pytz.timezone(tz)
 
     # Assign times/dates for the rest of the operations
     timenowtz = datetime.datetime.now(loc)
@@ -528,13 +446,58 @@ def horologium_universalis(lat, lng):
     dayafter = daynow + datetime.timedelta(days=1)
     dateafter = dayafter.date().strftime('%Y-%m-%d')
 
-    tempus = get_tempus_from_coord(lat, lng, timenow, thedate, datebefore, dateafter)
-    datetimes = get_datetimes_from_coord(lat, lng, thedate, datebefore, dateafter)
-    starttime = datetimes[0]
-    risetime = datetimes[1]
-    settime = datetimes[2]
-    endtime = datetimes[3]
-    mod_date = modify_date(starttime, risetime, settime, endtime, timenow, thedate, datebefore, dateafter)
+    # Make sunrise and sunset requests
+    # Powered by SunriseSunset.io: https://sunrisesunset.io/api/
+    url = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&date={thedate}&time_format=24"
+    r = requests.get(url)
+    response = r.json()
+    sunrise = response['results']['sunrise']
+    sunset = response['results']['sunset']
+
+    url2 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&date={datebefore}&time_format=24"
+    r2 = requests.get(url2)
+    response2 = r2.json()
+    nightstart = response2['results']['sunset']
+
+    url3 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&date={dateafter}&time_format=24"
+    r3 = requests.get(url3)
+    response3 = r3.json()
+    nightend = response3['results']['sunrise']
+    
+    # Convert sunrises and sunsets to datetimes
+    starttime = datetime.datetime.strptime(f"{datebefore}, {nightstart}", "%Y-%m-%d, %H:%M:%S")
+    risetime = datetime.datetime.strptime(f"{thedate}, {sunrise}", "%Y-%m-%d, %H:%M:%S")
+    settime = datetime.datetime.strptime(f"{thedate}, {sunset}", "%Y-%m-%d, %H:%M:%S")
+    endtime = datetime.datetime.strptime(f"{dateafter}, {nightend}", "%Y-%m-%d, %H:%M:%S")
+
+    # Find the tempus
+    if starttime <= timenow < risetime:
+        tempus = calc_nox_proxima(starttime, risetime, timenow)
+    elif risetime <= timenow < settime:
+        tempus = calc_dies(risetime, settime, timenow)
+    elif settime <= timenow < endtime:
+        tempus = calc_nox_superior(settime, endtime, timenow)
+    
+    # Modify the date based on Roman media nox. 
+    if starttime <= timenow < risetime:
+        nox_proxima = risetime - starttime
+        dimidium = nox_proxima/2
+        media_nox = starttime + dimidium
+        if starttime <= timenow < media_nox:
+            mod_date = datebefore
+        else:
+            mod_date = thedate
+    elif settime <= timenow < endtime:
+        nox_superior = endtime - settime
+        dimidium = nox_superior/2
+        media_nox = settime + dimidium
+        if media_nox <= timenow < endtime:
+            mod_date = dateafter
+        else:
+            mod_date = thedate
+    elif risetime <= timenow < settime:
+        mod_date = thedate
+
     ymd = split_date(mod_date)
     year = ymd[0]
     month = ymd[1]
@@ -550,33 +513,8 @@ def horologium_romanum(place_id):
     coords = make_coord_request(place_id)
     lat = coords[0]
     lng = coords[1]
-    loc = find_local_timezone(lat, lng)
 
-    # Assign times/dates for the rest of the operations
-    timenowtz = datetime.datetime.now(loc)
-    timenow = timenowtz.replace(tzinfo=None)
-    thedate = timenow.date().strftime('%Y-%m-%d')
-    daynow = datetime.datetime.strptime(f"{thedate}, 12:00:00", "%Y-%m-%d, %H:%M:%S")
-    daybefore = daynow - datetime.timedelta(days=1)
-    datebefore = daybefore.date().strftime('%Y-%m-%d')
-    dayafter = daynow + datetime.timedelta(days=1)
-    dateafter = dayafter.date().strftime('%Y-%m-%d')
-
-    tempus = get_tempus_from_coord(lat, lng, timenow, thedate, datebefore, dateafter)
-    datetimes = get_datetimes_from_coord(lat, lng, thedate, datebefore, dateafter)
-    starttime = datetimes[0]
-    risetime = datetimes[1]
-    settime = datetimes[2]
-    endtime = datetimes[3]
-    mod_date = modify_date(starttime, risetime, settime, endtime, timenow, thedate, datebefore, dateafter)
-    ymd = split_date(mod_date)
-    year = ymd[0]
-    month = ymd[1]
-    day = ymd[2]
-    mensis = get_mensis_from_month(month, year)
-    mensis_prox = get_mensis_prox(month, year)
-    datus = get_datus(day, mensis, mensis_prox)
-    datus_et_tempus = f"{datus}\n{tempus}\n"
+    datus_et_tempus = horologium_universalis(lat, lng)
     return datus_et_tempus
 
 # Solution found here: https://www.reddit.com/r/learnpython/comments/1c19y94/learning_dynamic_text_box/
