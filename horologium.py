@@ -439,10 +439,9 @@ def horologium_universalis(lat, lng):
     timenowtz = datetime.datetime.now(loc)
     timenow = timenowtz.replace(tzinfo=None)
     thedate = timenow.date().strftime('%Y-%m-%d')
-    daynow = datetime.datetime.strptime(f"{thedate}, 12:00:00", "%Y-%m-%d, %H:%M:%S")
-    daybefore = daynow - datetime.timedelta(days=1)
+    daybefore = timenow - datetime.timedelta(days=1)
     datebefore = daybefore.date().strftime('%Y-%m-%d')
-    dayafter = daynow + datetime.timedelta(days=1)
+    dayafter = timenow + datetime.timedelta(days=1)
     dateafter = dayafter.date().strftime('%Y-%m-%d')
 
     # Make sunrise and sunset requests
