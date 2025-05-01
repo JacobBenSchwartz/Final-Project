@@ -5,7 +5,7 @@ import requests
 timenowtz = datetime.datetime.now(timezone.utc)
 timenow = timenowtz.replace(tzinfo=None)
 thedate = timenow.date().strftime('%Y-%m-%d')
-daynow = datetime.datetime.strptime(f"{thedate}, 12:00:00 PM", "%Y-%m-%d, %I:%M:%S %p")
+daynow = datetime.datetime.strptime(f"{thedate}, 12:00:00 PM", "%Y-%m-%d, %H:%M:%S")
 
 daybefore = daynow - datetime.timedelta(days=1)
 datebefore = daybefore.date().strftime('%Y-%m-%d')
@@ -27,18 +27,18 @@ def make_coord_request(place_id):
 
 # Powered by SunriseSunset.io: https://sunrisesunset.io/api/
 def make_sun_request(lat, lng):
-    url = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={thedate}"
+    url = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={thedate}&time_format=24"
     r = requests.get(url)
     response = r.json()
     sunrise = response['results']['sunrise']
     sunset = response['results']['sunset']
 
-    url2 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={datebefore}"
+    url2 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={datebefore}&time_format=24"
     r2 = requests.get(url2)
     response2 = r2.json()
     nightstart = response2['results']['sunset']
 
-    url3 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={dateafter}"
+    url3 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={dateafter}&time_format=24"
     r3 = requests.get(url3)
     response3 = r3.json()
     nightend = response3['results']['sunrise']
@@ -46,10 +46,10 @@ def make_sun_request(lat, lng):
     return [nightstart, sunrise, sunset, nightend]
 
 def convert_sun_to_datetime(nightstart, sunrise, sunset, nightend):
-    starttime = datetime.datetime.strptime(f"{datebefore}, {nightstart}", "%Y-%m-%d, %I:%M:%S %p")
-    risetime = datetime.datetime.strptime(f"{thedate}, {sunrise}", "%Y-%m-%d, %I:%M:%S %p")
-    settime = datetime.datetime.strptime(f"{thedate}, {sunset}", "%Y-%m-%d, %I:%M:%S %p")
-    endtime = datetime.datetime.strptime(f"{dateafter}, {nightend}", "%Y-%m-%d, %I:%M:%S %p")
+    starttime = datetime.datetime.strptime(f"{datebefore}, {nightstart}", "%Y-%m-%d, %H:%M:%S")
+    risetime = datetime.datetime.strptime(f"{thedate}, {sunrise}", "%Y-%m-%d, %H:%M:%S")
+    settime = datetime.datetime.strptime(f"{thedate}, {sunset}", "%Y-%m-%d, %H:%M:%S")
+    endtime = datetime.datetime.strptime(f"{dateafter}, {nightend}", "%Y-%m-%d, %H:%M:%S")
     return [starttime, risetime, settime, endtime]
 
 def get_datetimes_from_coord(lat, lng):
