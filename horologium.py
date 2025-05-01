@@ -1,7 +1,9 @@
 import datetime
+from datetime import timezone
 import requests
 
-timenow = datetime.datetime.now()
+timenowtz = datetime.datetime.now(timezone.utc)
+timenow = timenowtz.replace(tzinfo=None)
 thedate = timenow.date().strftime('%Y-%m-%d')
 daynow = datetime.datetime.strptime(f"{thedate}, 12:00:00 PM", "%Y-%m-%d, %I:%M:%S %p")
 
