@@ -1,21 +1,7 @@
 import datetime
-from datetime import timezone
+import pytz
+from timezonefinder import TimezoneFinder
 import requests
-
-timenowtz = datetime.datetime.now(timezone.utc)
-timenow = timenowtz.replace(tzinfo=None)
-
-thedate = timenow.date().strftime('%Y-%m-%d')
-
-daybefore = timenow - datetime.timedelta(days=1)
-datebefore = daybefore.date().strftime('%Y-%m-%d')
-daybefore2 = timenow - datetime.timedelta(days=2)
-datebefore2 = daybefore.date().strftime('%Y-%m-%d')
-
-dayafter = timenow + datetime.timedelta(days=1)
-dateafter = dayafter.date().strftime('%Y-%m-%d')
-dayafter2 = timenow + datetime.timedelta(days=2)
-dateafter2 = dayafter.date().strftime('%Y-%m-%d')
 
 
 
@@ -29,74 +15,7 @@ def make_coord_request(place_id):
     lng = response['features'][0]['geometry']['coordinates'][0]
     return [lat, lng]
 
-# Powered by SunriseSunset.io: https://sunrisesunset.io/api/
-def make_sun_request(lat, lng):
-    url = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={thedate}&time_format=24"
-    r = requests.get(url)
-    response = r.json()
-    sunrise = response['results']['sunrise']
-    sunset = response['results']['sunset']
-
-    url2 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={datebefore}&time_format=24"
-    r2 = requests.get(url2)
-    response2 = r2.json()
-    daystart = response2['results']['sunrise']
-    nightstart = response2['results']['sunset']
-
-    url3 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&timezone=UTC&date={dateafter}&time_format=24"
-    r3 = requests.get(url3)
-    response3 = r3.json()
-    nightend = response3['results']['sunrise']
-    dayend = response3['results']['sunset']
-
-    return [daystart, nightstart, sunrise, sunset, nightend, dayend]
-
-def convert_sun_to_datetime(daystart, nightstart, sunrise, sunset, nightend, dayend, lng):
-    splitrise = sunrise.split(':')
-    hrise = splitrise[0]
-    hrisefl = float(hrise)
-    splitset = sunset.split(':')
-    hset = splitset[0]
-    hsetfl = float(hset)
-    lngfl = float(lng)
-
-    if hrisefl < hsetfl:
-        firsttime = datetime.datetime.strptime(f"{datebefore}, {daystart}", "%Y-%m-%d, %H:%M:%S")
-        secondtime = datetime.datetime.strptime(f"{datebefore}, {nightstart}", "%Y-%m-%d, %H:%M:%S")
-        risetime = datetime.datetime.strptime(f"{thedate}, {sunrise}", "%Y-%m-%d, %H:%M:%S")
-        settime = datetime.datetime.strptime(f"{thedate}, {sunset}", "%Y-%m-%d, %H:%M:%S")
-        penulttime = datetime.datetime.strptime(f"{dateafter}, {nightend}", "%Y-%m-%d, %H:%M:%S")
-        lasttime = datetime.datetime.strptime(f"{dateafter}, {dayend}", "%Y-%m-%d, %H:%M:%S")
-    
-    if hrisefl > hsetfl:
-        if lngfl>0:
-            firsttime = datetime.datetime.strptime(f"{datebefore2}, {daystart}", "%Y-%m-%d, %H:%M:%S")
-            secondtime = datetime.datetime.strptime(f"{datebefore}, {nightstart}", "%Y-%m-%d, %H:%M:%S")
-            risetime = datetime.datetime.strptime(f"{datebefore}, {sunrise}", "%Y-%m-%d, %H:%M:%S")
-            settime = datetime.datetime.strptime(f"{thedate}, {sunset}", "%Y-%m-%d, %H:%M:%S")
-            penulttime = datetime.datetime.strptime(f"{thedate}, {nightend}", "%Y-%m-%d, %H:%M:%S")
-            lasttime = datetime.datetime.strptime(f"{dateafter}, {dayend}", "%Y-%m-%d, %H:%M:%S")
-        if lngfl<0:
-            firsttime = datetime.datetime.strptime(f"{datebefore}, {daystart}", "%Y-%m-%d, %H:%M:%S")
-            secondtime = datetime.datetime.strptime(f"{thedate}, {nightstart}", "%Y-%m-%d, %H:%M:%S")
-            risetime = datetime.datetime.strptime(f"{thedate}, {sunrise}", "%Y-%m-%d, %H:%M:%S")
-            settime = datetime.datetime.strptime(f"{dateafter}, {sunset}", "%Y-%m-%d, %H:%M:%S")
-            penulttime = datetime.datetime.strptime(f"{dateafter}, {nightend}", "%Y-%m-%d, %H:%M:%S")
-            lasttime = datetime.datetime.strptime(f"{dateafter2}, {dayend}", "%Y-%m-%d, %H:%M:%S")
-    return [firsttime, secondtime, risetime, settime, penulttime, lasttime]
-
-def get_datetimes_from_coord(lat, lng):
-    srss = make_sun_request(lat, lng)
-    daystart = srss[0]
-    nightstart = srss[1]
-    sunrise = srss[2]
-    sunset = srss[3]
-    nightend = srss[4]
-    dayend = srss[5]
-    datetimes = convert_sun_to_datetime(daystart, nightstart, sunrise, sunset, nightend, dayend, lng)
-    return datetimes
-
-def calc_hodie(risetime, settime):
+def calc_dies(risetime, settime, timenow):
     dies = settime-risetime
     hora = dies/12
     hora_prima = risetime
@@ -139,94 +58,8 @@ def calc_hodie(risetime, settime):
         tempus = "Eheu! Couldn't find the hour of the day!"
     return tempus
 
-def calc_heri(firsttime, secondtime):
-    dies = secondtime-firsttime
-    hora = dies/12
-    hora_prima = firsttime
-    hora_secunda = hora_prima+hora
-    hora_tertia = hora_prima+hora*2
-    hora_quarta = hora_prima+hora*3
-    hora_quinta = hora_prima+hora*4
-    hora_sexta = hora_prima+hora*5
-    hora_septima = hora_prima+hora*6
-    hora_octava = hora_prima+hora*7
-    hora_nona = hora_prima+hora*8
-    hora_decima = hora_prima+hora*9
-    hora_undecima = hora_prima+hora*10
-    hora_duodecima = hora_prima+hora*11
-    if hora_prima <= timenow < hora_secunda:
-        tempus = "\nI\nprima diei hora"
-    elif hora_secunda <= timenow < hora_tertia:
-        tempus = "\nII\nseconda diei hora"
-    elif hora_tertia <= timenow < hora_quarta:
-        tempus = "\nIII\ntertia diei hora"
-    elif hora_quarta <= timenow < hora_quinta:
-        tempus = "\nIV\nquarta diei hora"
-    elif hora_quinta <= timenow < hora_sexta:
-        tempus = "\nV\nquinta diei hora"
-    elif hora_sexta <= timenow < hora_septima:
-        tempus = "\nVI\nsexta diei hora"
-    elif hora_septima <= timenow < hora_octava:
-        tempus = "\nVII\nseptima diei hora"
-    elif hora_octava <= timenow < hora_nona:
-        tempus = "\nVIII\noctava diei hora"
-    elif hora_nona <= timenow < hora_decima:
-        tempus = "\nIX\nnona diei hora"
-    elif hora_decima <= timenow < hora_undecima:
-        tempus = "\nX\ndecima diei hora"
-    elif hora_undecima <= timenow < hora_duodecima:
-        tempus = "\nXI\nundecima diei hora"
-    elif hora_duodecima <= timenow < secondtime:
-        tempus = "\nXII\nduodecima diei hora"
-    else:
-        tempus = "Eheu! Couldn't find the hour of the day!"
-    return tempus
-
-def calc_cras(penulttime, lasttime):
-    dies = lasttime-penulttime
-    hora = dies/12
-    hora_prima = penulttime
-    hora_secunda = hora_prima+hora
-    hora_tertia = hora_prima+hora*2
-    hora_quarta = hora_prima+hora*3
-    hora_quinta = hora_prima+hora*4
-    hora_sexta = hora_prima+hora*5
-    hora_septima = hora_prima+hora*6
-    hora_octava = hora_prima+hora*7
-    hora_nona = hora_prima+hora*8
-    hora_decima = hora_prima+hora*9
-    hora_undecima = hora_prima+hora*10
-    hora_duodecima = hora_prima+hora*11
-    if hora_prima <= timenow < hora_secunda:
-        tempus = "\nI\nprima diei hora"
-    elif hora_secunda <= timenow < hora_tertia:
-        tempus = "\nII\nseconda diei hora"
-    elif hora_tertia <= timenow < hora_quarta:
-        tempus = "\nIII\ntertia diei hora"
-    elif hora_quarta <= timenow < hora_quinta:
-        tempus = "\nIV\nquarta diei hora"
-    elif hora_quinta <= timenow < hora_sexta:
-        tempus = "\nV\nquinta diei hora"
-    elif hora_sexta <= timenow < hora_septima:
-        tempus = "\nVI\nsexta diei hora"
-    elif hora_septima <= timenow < hora_octava:
-        tempus = "\nVII\nseptima diei hora"
-    elif hora_octava <= timenow < hora_nona:
-        tempus = "\nVIII\noctava diei hora"
-    elif hora_nona <= timenow < hora_decima:
-        tempus = "\nIX\nnona diei hora"
-    elif hora_decima <= timenow < hora_undecima:
-        tempus = "\nX\ndecima diei hora"
-    elif hora_undecima <= timenow < hora_duodecima:
-        tempus = "\nXI\nundecima diei hora"
-    elif hora_duodecima <= timenow < lasttime:
-        tempus = "\nXII\nduodecima diei hora"
-    else:
-        tempus = "Eheu! Couldn't find the hour of the day!"
-    return tempus
-
 # quid proxima, quid superiore nocte egeris (Cic. Cat. 1.1.1)
-def calc_nox_proxima(startime, risetime):
+def calc_nox_proxima(startime, risetime, timenow):
     nox = risetime - startime
     hora = nox/12
     hora_prima = startime
@@ -277,8 +110,8 @@ def calc_nox_proxima(startime, risetime):
         tempus = "Eheu! Couldn't find the hour of the last night!"
     return tempus
 
-def calc_nox_superior(settime, penulttime):
-    nox = penulttime - settime
+def calc_nox_superior(settime, endtime, timenow):
+    nox = endtime - settime
     hora = nox/12
     hora_prima = settime
     hora_secunda = hora_prima+hora
@@ -327,61 +160,6 @@ def calc_nox_superior(settime, penulttime):
     else:
         tempus = "Eheu! Couldn't find the hour of the next night!"
     return tempus 
-
-def get_tempus_from_coord(lat, lng):
-    datetimes = get_datetimes_from_coord(lat, lng)
-    firsttime = datetimes[0]
-    secondtime = datetimes[1]
-    risetime = datetimes[2]
-    settime = datetimes[3]
-    penulttime = datetimes[4]
-    lasttime = datetimes[5]
-    if firsttime <= timenow < secondtime:
-        heri = calc_heri(firsttime, secondtime)
-        return heri
-    elif secondtime <= timenow < risetime:
-        nox_proxima = calc_nox_proxima(secondtime, risetime)
-        return nox_proxima
-    elif risetime <= timenow < settime:
-        hodie = calc_hodie(risetime, settime)
-        return hodie
-    elif settime <= timenow < penulttime:
-        nox_superior = calc_nox_superior(settime, penulttime)
-        return nox_superior
-    elif penulttime <= timenow < lasttime:
-        cras = calc_cras(penulttime, lasttime)
-        return cras
-    else:
-        return "Eheu! Couldn't get the time from the sun"
-
-
-
-def modify_date(firsttime, secondtime, risetime, settime, penulttime, lasttime):
-    if secondtime <= timenow < risetime:
-        nox_proxima = risetime - secondtime
-        dimidium = nox_proxima/2
-        media_nox = secondtime + dimidium
-        if secondtime <= timenow < media_nox:
-            mod_date = datebefore
-        else:
-            mod_date = thedate
-    elif settime <= timenow < penulttime:
-        nox_superior = penulttime - settime
-        dimidium = nox_superior/2
-        media_nox = settime + dimidium
-        if media_nox <= timenow < penulttime:
-            mod_date = dateafter
-        else:
-            mod_date = thedate
-    elif risetime <= timenow < settime:
-        mod_date = thedate
-    elif firsttime <= timenow < secondtime:
-        mod_date = datebefore
-    elif penulttime <= timenow < lasttime:
-        mod_date = dateafter
-    else:
-        mod_date = "Eheu! Couldn't figure out if it's past midnight!"
-    return mod_date
 
 
 def split_date(mod_date):
@@ -646,15 +424,78 @@ def get_datus(day, mensis, mensis_prox):
 
 
 def horologium_universalis(lat, lng):
-    tempus = get_tempus_from_coord(lat, lng)
-    datetimes = get_datetimes_from_coord(lat, lng)
-    firsttime = datetimes[0]
-    secondtime = datetimes[1]
-    risetime = datetimes[2]
-    settime = datetimes[3]
-    penulttime = datetimes[4]
-    lasttime = datetimes[5]
-    mod_date = modify_date(firsttime, secondtime, risetime, settime, penulttime, lasttime)
+    # Find local timezone
+    # Modified solution from here: https://stackoverflow.com/questions/15742045/getting-time-zone-from-lat-long-coordinates
+    # and from here: https://www.geeksforgeeks.org/get-current-time-in-different-timezone-using-python/
+    tf = TimezoneFinder()
+    
+    latfl = float(lat)
+    lngfl =float(lng)
+
+    tz = tf.timezone_at(lng=lngfl, lat=latfl)
+    loc = pytz.timezone(tz)
+
+    # Assign times/dates for the rest of the operations
+    timenowtz = datetime.datetime.now(loc)
+    timenow = timenowtz.replace(tzinfo=None)
+    thedate = timenow.date().strftime('%Y-%m-%d')
+    daybefore = timenow - datetime.timedelta(days=1)
+    datebefore = daybefore.date().strftime('%Y-%m-%d')
+    dayafter = timenow + datetime.timedelta(days=1)
+    dateafter = dayafter.date().strftime('%Y-%m-%d')
+
+    # Make sunrise and sunset requests
+    # Powered by SunriseSunset.io: https://sunrisesunset.io/api/
+    url = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&date={thedate}&time_format=24"
+    r = requests.get(url)
+    response = r.json()
+    sunrise = response['results']['sunrise']
+    sunset = response['results']['sunset']
+
+    url2 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&date={datebefore}&time_format=24"
+    r2 = requests.get(url2)
+    response2 = r2.json()
+    nightstart = response2['results']['sunset']
+
+    url3 = f"https://api.sunrisesunset.io/json?lat={lat}&lng={lng}&date={dateafter}&time_format=24"
+    r3 = requests.get(url3)
+    response3 = r3.json()
+    nightend = response3['results']['sunrise']
+    
+    # Convert sunrises and sunsets to datetimes
+    starttime = datetime.datetime.strptime(f"{datebefore}, {nightstart}", "%Y-%m-%d, %H:%M:%S")
+    risetime = datetime.datetime.strptime(f"{thedate}, {sunrise}", "%Y-%m-%d, %H:%M:%S")
+    settime = datetime.datetime.strptime(f"{thedate}, {sunset}", "%Y-%m-%d, %H:%M:%S")
+    endtime = datetime.datetime.strptime(f"{dateafter}, {nightend}", "%Y-%m-%d, %H:%M:%S")
+
+    # Find the tempus
+    if starttime <= timenow < risetime:
+        tempus = calc_nox_proxima(starttime, risetime, timenow)
+    elif risetime <= timenow < settime:
+        tempus = calc_dies(risetime, settime, timenow)
+    elif settime <= timenow < endtime:
+        tempus = calc_nox_superior(settime, endtime, timenow)
+    
+    # Modify the date based on Roman media nox. 
+    if starttime <= timenow < risetime:
+        nox_proxima = risetime - starttime
+        dimidium = nox_proxima/2
+        media_nox = starttime + dimidium
+        if starttime <= timenow < media_nox:
+            mod_date = datebefore
+        else:
+            mod_date = thedate
+    elif settime <= timenow < endtime:
+        nox_superior = endtime - settime
+        dimidium = nox_superior/2
+        media_nox = settime + dimidium
+        if media_nox <= timenow < endtime:
+            mod_date = dateafter
+        else:
+            mod_date = thedate
+    elif risetime <= timenow < settime:
+        mod_date = thedate
+
     ymd = split_date(mod_date)
     year = ymd[0]
     month = ymd[1]
@@ -670,6 +511,7 @@ def horologium_romanum(place_id):
     coords = make_coord_request(place_id)
     lat = coords[0]
     lng = coords[1]
+
     datus_et_tempus = horologium_universalis(lat, lng)
     return datus_et_tempus
 
@@ -706,6 +548,7 @@ def print_in_box(text: str) -> None:
         print(formatted_line)
 
     print(horizontal_border)
+
 
 def horologium():
     while True:
