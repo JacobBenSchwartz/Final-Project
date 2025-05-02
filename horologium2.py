@@ -96,7 +96,7 @@ def get_datetimes_from_coord(lat, lng):
     datetimes = convert_sun_to_datetime(daystart, nightstart, sunrise, sunset, nightend, dayend, lng)
     return datetimes
 
-def calc_dies_hodie(risetime, settime):
+def calc_hodie(risetime, settime):
     dies = settime-risetime
     hora = dies/12
     hora_prima = risetime
@@ -139,7 +139,7 @@ def calc_dies_hodie(risetime, settime):
         tempus = "Eheu! Couldn't find the hour of the day!"
     return tempus
 
-def calc_dies_heri(firsttime, secondtime):
+def calc_heri(firsttime, secondtime):
     dies = secondtime-firsttime
     hora = dies/12
     hora_prima = firsttime
@@ -182,7 +182,7 @@ def calc_dies_heri(firsttime, secondtime):
         tempus = "Eheu! Couldn't find the hour of the day!"
     return tempus
 
-def calc_dies_cras(penulttime, lasttime):
+def calc_cras(penulttime, lasttime):
     dies = lasttime-penulttime
     hora = dies/12
     hora_prima = penulttime
@@ -337,20 +337,20 @@ def get_tempus_from_coord(lat, lng):
     penulttime = datetimes[4]
     lasttime = datetimes[5]
     if firsttime <= timenow < secondtime:
-        dies_heri = calc_dies_heri(firsttime, secondtime)
-        return dies_heri
+        heri = calc_heri(firsttime, secondtime)
+        return heri
     elif secondtime <= timenow < risetime:
         nox_proxima = calc_nox_proxima(secondtime, risetime)
         return nox_proxima
     elif risetime <= timenow < settime:
-        dies = calc_dies_hodie(risetime, settime)
-        return dies
+        hodie = calc_hodie(risetime, settime)
+        return hodie
     elif settime <= timenow < penulttime:
         nox_superior = calc_nox_superior(settime, penulttime)
         return nox_superior
     elif penulttime <= timenow < lasttime:
-        dies_cras = calc_dies_cras(penulttime, lasttime)
-        return dies_cras
+        cras = calc_cras(penulttime, lasttime)
+        return cras
     else:
         return "Eheu! Couldn't get the time from the sun"
 
