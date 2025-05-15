@@ -460,7 +460,7 @@ def horologium_universalis(lat, lng):
     elif day == mensis['nonae']-1:
         datus = f"\nprid. Non. {mensis['abbr.']}\n(pridie Nonas {mensis['acc.fem.pl.']})"
     elif day == mensis['idus']-1:
-        datus = f"\nprid. Non. {mensis['abbr.']}\n(pridie Idus {mensis['acc.fem.pl.']})"
+        datus = f"\nprid. Eid. {mensis['abbr.']}\n(pridie Idus {mensis['acc.fem.pl.']})"
     elif day == mensis['days']:
         datus = f"\nprid. Kal. {mensis_prox['abbr.']}\n(pridie Kalendas {mensis_prox['acc.fem.pl.']})"
     elif mensis == menses['Februarius (leap year)']:
